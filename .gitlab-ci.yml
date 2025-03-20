@@ -5,8 +5,36 @@ variables:
   DOCKER_IMAGE_NAME: ${CI_REGISTRY_IMAGE}/pyqgis-qt-checker:latest
   DOCKER_IMAGE_GITTAG: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
   DOCKER_IMAGE_LATEST: ${DOCKER_IMAGE_NAME}:latest
+  PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
+  PYTHON_MINIMAL_VERSION: "3.11"
+
+cache:
+  key:
+    files:
+      - requirements/*.txt
+  paths:
+    - ${PIP_CACHE_DIR}
+    - ${PRE_COMMIT_HOME}
 
 # -- LINT JOBS ---
+git-hooks:
+  stage: 🧹 lint
+  tags:
+    - oslandia_docker
+  image: python:${PYTHON_MINIMAL_VERSION}
+  variables:
+    PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
+  cache:
+    paths:
+      - ${PRE_COMMIT_HOME}
+  before_script:
+    - apt install pipx
+    - pipx install pre-commit
+    - pre-commit install
+    - git fetch origin
+  script:
+    - pre-commit run --from-ref "origin/$CI_DEFAULT_BRANCH" --to-ref "$CI_COMMIT_SHA";
+
 # docker-hadolint:
 #   stage: 🧹 lint
 #   image: registry.gitlab.com/pipeline-components/hadolint:latest
