@@ -1,5 +1,7 @@
 stages:
   - 🧹 lint
+  - 🐳 build
+  - 🤞 test
 
 variables:
   DOCKER_IMAGE_NAME: ${CI_REGISTRY_IMAGE}/pyqgis-qt-checker:latest
