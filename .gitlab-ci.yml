@@ -2,6 +2,7 @@ stages:
   - 🧹 lint
   - 🐳 build
   - 🤞 test
+  - 🚀 deploy
 
 variables:
   DOCKER_IMAGE_NAME: pyqgis-qt-checker
