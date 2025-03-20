@@ -11,3 +11,14 @@ docker build --pull --rm -f 'Dockerfile' -t 'pyqgis4checker:latest' '.'
 ```sh
 docker run pyqgis4checker:latest pyqt5_to_pyqt6.py --help
 ```
+
+## Lint
+
+```sh
+sudo apt install pipx
+pipx install pre-commit
+```
+
+```sh
+pre-commit install
+```
