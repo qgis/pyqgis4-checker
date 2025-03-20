@@ -5,7 +5,7 @@ stages:
 
 variables:
   DOCKER_IMAGE_NAME: pyqgis-qt-checker
-  DOCKER_IMAGE_GITTAG:  ${CI_COMMIT_REF_SLUG}
+  DOCKER_IMAGE_GITTAG: ${CI_COMMIT_REF_SLUG}
   DOCKER_IMAGE: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_GITTAG}
   DOCKER_IMAGE_LATEST: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:latest
   PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
@@ -102,13 +102,29 @@ test-image-pyqgis-checker:
     - echo "Testing pyqt5_to_pyqt6 script from wihtin image $DOCKER_IMAGE"
     - docker run --rm $DOCKER_IMAGE pyqt5_to_pyqt6.py --help
 
-# # -- DEPLOY --
-# release-image:
-#   stage: 🚀 deploy
-#   script:
-#     - docker pull $CONTAINER_TEST_IMAGE
-#     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-#     - docker push $CONTAINER_RELEASE_IMAGE
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG
-#       when: always
+# -- DEPLOY --
+release-image:
+  stage: 🚀 deploy
+  extends: .docker_config
+  rules:
+    - if: $CI_COMMIT_BRANCH ==  $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG
+      when: always
+    - when: never
+  needs:
+    - job: test-image-pyqgis-checker
+    - job: ctner-pyqgis-checker
+      artifacts: true
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker load < image.tar.gz
+  script:
+    - echo "Publishing image $DOCKER_IMAGE_NAME"
+    # tag image as latest if running on default branch
+    - |
+      if [ "$CI_COMMIT_BRANCH" =  $CI_DEFAULT_BRANCH ] || [ -n "$CI_COMMIT_TAG" ]; then
+        docker tag $DOCKER_IMAGE $DOCKER_IMAGE_LATEST
+        docker push $DOCKER_IMAGE_LATEST
+      fi
+    - docker push $DOCKER_IMAGE
+  after_script:
+    - docker logout ${CI_REGISTRY}
