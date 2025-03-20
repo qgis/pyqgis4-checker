@@ -20,8 +20,10 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONOPTIMIZE 2
 
 # Import generated files from build stage
-# hadolint ignore=DL1000
-COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/install/ /usr/local/
+
+# DISABLED because of too old Docker version to handle syntax directive
+# COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/install/ /usr/local/
+COPY --from=build  /root/QGIS/build/install/ /usr/local/
 COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
 
 # Install required dependencies
