@@ -24,7 +24,10 @@ ENV PYTHONOPTIMIZE 2
 # DISABLED because of too old Docker version to handle syntax directive
 # COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/install/ /usr/local/
 COPY --from=build  /root/QGIS/build/install/ /usr/local/
-COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
+
+# TEMPORARY: GET THE LATEST SCRIPT VERSION WAITING FOR SOURCE IMAGE TO BE UPDATED
+# COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
+ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5_to_pyqt6/pyqt5_to_pyqt6.py /usr/local/bin/
 
 # Install required dependencies
 RUN dnf install -y python3-pip python3-pyqt6 python3-qscintilla-qt6 \
