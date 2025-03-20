@@ -29,7 +29,7 @@ cache:
     - oslandia_linux_vm
 
 # -- LINT JOBS ---
-git-hooks:
+lint:git-hooks:
   stage: 🧹 lint
   tags:
     - oslandia_docker
@@ -66,7 +66,7 @@ git-hooks:
 #   #     - "reports/*"
 
 # -- BUILD JOBS --
-ctner-pyqgis-checker:
+build:image-pyqgis-checker:
   stage: 🐳 build
   extends: .docker_config
   before_script:
@@ -91,11 +91,11 @@ ctner-pyqgis-checker:
     expire_in: 7 day
 
 # -- TEST JOBS --
-test-image-pyqgis-checker:
+test:image-pyqgis-checker:
   stage: 🤞 test
   extends: .docker_config
   needs:
-    - job: ctner-pyqgis-checker
+    - job: build:image-pyqgis-checker
       artifacts: true
   before_script:
     - docker load < image.tar.gz
@@ -104,7 +104,7 @@ test-image-pyqgis-checker:
     - docker run --rm $DOCKER_IMAGE pyqt5_to_pyqt6.py --help
 
 # -- DEPLOY --
-release-image:
+release:image:
   stage: 🚀 deploy
   extends: .docker_config
   rules:
@@ -112,8 +112,8 @@ release-image:
       when: always
     - when: never
   needs:
-    - job: test-image-pyqgis-checker
-    - job: ctner-pyqgis-checker
+    - job: test:image-pyqgis-checker
+    - job: build:image-pyqgis-checker
       artifacts: true
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -138,3 +138,25 @@ release-image:
 
   after_script:
     - docker logout ${CI_REGISTRY}
+
+release:publish:
+  stage: 🚀 deploy
+  tags:
+    - oslandia_docker
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: release:image
+  script:
+    - echo "Creating release for tag $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Release $CI_COMMIT_TAG'
+    assets:
+      links:
+        - name: "Docker Image"
+          url: "${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${CI_COMMIT_TAG}"
