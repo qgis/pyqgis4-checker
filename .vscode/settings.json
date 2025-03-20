@@ -1,0 +1,19 @@
+{
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+        "editor.formatOnSave": true,
+        "editor.quickSuggestions": {
+            "strings": true
+        }
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.formatOnSave": true,
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "off",
+            "strings": "inline"
+        },
+        "editor.suggest.insertMode": "replace"
+    }
+}
