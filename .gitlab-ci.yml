@@ -120,12 +120,21 @@ release-image:
     - docker load < image.tar.gz
   script:
     - echo "Publishing image $DOCKER_IMAGE_NAME"
+
+    # if triggered by git tag, use it as Docker image tag
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        TAGGED_IMAGE=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${CI_COMMIT_TAG}
+        docker tag $DOCKER_IMAGE $TAGGED_IMAGE
+        docker push $TAGGED_IMAGE
+      fi
+
     # tag image as latest if running on default branch
     - |
       if [ "$CI_COMMIT_BRANCH" =  $CI_DEFAULT_BRANCH ] || [ -n "$CI_COMMIT_TAG" ]; then
         docker tag $DOCKER_IMAGE $DOCKER_IMAGE_LATEST
         docker push $DOCKER_IMAGE_LATEST
       fi
-    - docker push $DOCKER_IMAGE
+
   after_script:
     - docker logout ${CI_REGISTRY}
