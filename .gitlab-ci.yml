@@ -69,6 +69,8 @@ lint:git-hooks:
 build:image-pyqgis-checker:
   stage: 🐳 build
   extends: .docker_config
+  variables:
+    DOCKER_BUILDKIT: 1
   before_script:
     - docker --version
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
