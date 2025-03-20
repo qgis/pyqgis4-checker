@@ -90,7 +90,7 @@ build:image-pyqgis-checker:
   artifacts:
     paths:
       - image.tar.gz
-    expire_in: 7 day
+    expire_in: 3 hrs
 
 # -- TEST JOBS --
 test:image-pyqgis-checker:
