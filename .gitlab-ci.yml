@@ -22,14 +22,13 @@ git-hooks:
   tags:
     - oslandia_docker
   image: python:${PYTHON_MINIMAL_VERSION}
-  variables:
-    PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
-  cache:
-    paths:
-      - ${PRE_COMMIT_HOME}
   before_script:
-    - apt install pipx
-    - pipx install pre-commit
+    - apt install git
+    - python3 -m pip install -U pip setuptools wheel
+    - python3 -m venv .venv
+    - virtualenv venv
+    - source .venv/bin/activate
+    - pip install pre-commit
     - pre-commit install
     - git fetch origin
   script:
