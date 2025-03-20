@@ -9,7 +9,7 @@ variables:
 # -- LINT JOBS ---
 docker-hadolint:
   stage: 🧹 lint
-  image: hadolint/hadolint:latest-debian
+  image: registry.gitlab.com/pipeline-components/hadolint:latest
   tags:
     - oslandia_docker
   script:
