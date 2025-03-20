@@ -4,9 +4,10 @@ stages:
   - 🤞 test
 
 variables:
-  DOCKER_IMAGE_NAME: ${CI_REGISTRY_IMAGE}/pyqgis-qt-checker
-  DOCKER_IMAGE_GITTAG: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-  DOCKER_IMAGE_LATEST: ${DOCKER_IMAGE_NAME}:latest
+  DOCKER_IMAGE_NAME: pyqgis-qt-checker
+  DOCKER_IMAGE_GITTAG:  ${CI_COMMIT_REF_SLUG}
+  DOCKER_IMAGE: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+  DOCKER_IMAGE_LATEST: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:latest
   PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
   PYTHON_MINIMAL_VERSION: "3.11"
 
@@ -74,7 +75,7 @@ ctner-pyqgis-checker:
     - echo "Building image"
     - docker build
       --cache-from $DOCKER_IMAGE_LATEST
-      --tag $DOCKER_IMAGE_GITTAG
+      --tag $DOCKER_IMAGE
       --pull
       -f Dockerfile
       .
