@@ -6,7 +6,7 @@ stages:
 variables:
   DOCKER_IMAGE_NAME: pyqgis-qt-checker
   DOCKER_IMAGE_GITTAG:  ${CI_COMMIT_REF_SLUG}
-  DOCKER_IMAGE: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+  DOCKER_IMAGE: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_GITTAG}
   DOCKER_IMAGE_LATEST: ${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE_NAME}:latest
   PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
   PYTHON_MINIMAL_VERSION: "3.11"
@@ -72,7 +72,7 @@ ctner-pyqgis-checker:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $DOCKER_IMAGE_NAME || true # retrieve image if it does exist
   script:
-    - echo "Building image"
+    - echo "Building image $DOCKER_IMAGE_NAME"
     - docker build
       --cache-from $DOCKER_IMAGE_LATEST
       --tag $DOCKER_IMAGE
