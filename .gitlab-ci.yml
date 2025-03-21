@@ -17,7 +17,8 @@ variables:
   image: docker:28.0.2
   services:
     - docker:28.0.2-dind
-  # tags:
+  tags:
+    - gitlab-org-docker
   #   - oslandia_docker
   #   - oslandia_linux_vm
 
