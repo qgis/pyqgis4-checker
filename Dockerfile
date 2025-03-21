@@ -22,7 +22,6 @@ ENV PYTHONOPTIMIZE 2
 # Import generated files from build stage
 COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/install/ /usr/local/
 
-
 # TEMPORARY: GET THE LATEST SCRIPT VERSION WAITING FOR SOURCE IMAGE TO BE UPDATED
 # COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
 ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5_to_pyqt6/pyqt5_to_pyqt6.py /usr/local/bin/
@@ -33,7 +32,8 @@ RUN dnf install -y python3-pip python3-pyqt6 python3-qscintilla-qt6 \
     && dnf -y remove python3-pip \
     && dnf clean all
 
-# Reference QGIS Python packages into the Python environment
+# Reference QGIS headers and Python packages into the Python environment
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=/usr/local/share/qgis/python:$PYTHONPATH
 
 # Create non-root user
