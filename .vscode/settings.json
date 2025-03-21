@@ -15,5 +15,9 @@
             "strings": "inline"
         },
         "editor.suggest.insertMode": "replace"
-    }
+    },
+    // extensions
+    "gitlab.duo.enabledWithoutGitlabProject": false,
+    "gitlab.duoChat.enabled": false,
+    "gitlab.duoCodeSuggestions.enabled": false
 }
