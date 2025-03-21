@@ -103,6 +103,7 @@ test:image-pyqgis-checker:
     - docker load < image.tar.gz
   script:
     - echo "Testing pyqt5_to_pyqt6 script from wihtin image $DOCKER_IMAGE"
+    - docker run --rm $DOCKER_IMAGE python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
     - docker run --rm $DOCKER_IMAGE pyqt5_to_pyqt6.py --help
 
 # -- DEPLOY --
