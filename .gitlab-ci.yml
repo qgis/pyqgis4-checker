@@ -27,7 +27,7 @@ cache:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_HOST: tcp://docker:2376
   services:
-    - docker:dind
+    - docker:28-dind
   tags:
     - oslandia_docker
 
