@@ -22,11 +22,11 @@ cache:
 
 # Common configuration for Docker jobs
 .docker_config:
-  image: docker:latest
+  image: docker:28
   services:
     - docker:dind
   tags:
-    - oslandia_linux_vm
+    - oslandia_docker
 
 # -- LINT JOBS ---
 lint:git-hooks:
