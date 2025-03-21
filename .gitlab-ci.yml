@@ -22,12 +22,12 @@ cache:
 
 # Common configuration for Docker jobs
 .docker_config:
-  image: docker:28
+  image: docker:28.0.2
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_HOST: tcp://docker:2376
   services:
-    - docker:28-dind
+    - docker:28.0.2-dind
   tags:
     - oslandia_docker
 
