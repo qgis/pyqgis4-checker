@@ -23,6 +23,9 @@ cache:
 # Common configuration for Docker jobs
 .docker_config:
   image: docker:28
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_HOST: tcp://docker:2376
   services:
     - docker:dind
   tags:
