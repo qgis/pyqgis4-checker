@@ -26,7 +26,8 @@ cache:
   services:
     - docker:28.0.2-dind
   tags:
-    - oslandia_docker
+    # - oslandia_docker
+    - oslandia_linux_vm
 
 # -- LINT JOBS ---
 lint:git-hooks:
@@ -71,8 +72,8 @@ build:image-pyqgis-checker:
   extends: .docker_config
   variables:
     DOCKER_BUILDKIT: 1
-    DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_CERTDIR: "/certs"
+    # DOCKER_HOST: tcp://docker:2376
+    # DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     - docker --version
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
