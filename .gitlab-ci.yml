@@ -12,14 +12,6 @@ variables:
   PRE_COMMIT_HOME: ${CI_PROJECT_DIR}/.cache/pre-commit
   PYTHON_MINIMAL_VERSION: "3.11"
 
-cache:
-  key:
-    files:
-      - requirements/*.txt
-  paths:
-    - ${PIP_CACHE_DIR}
-    - ${PRE_COMMIT_HOME}
-
 # Common configuration for Docker jobs
 .docker_config:
   image: docker:28.0.2
@@ -35,6 +27,13 @@ lint:git-hooks:
   tags:
     - oslandia_docker
   image: python:${PYTHON_MINIMAL_VERSION}
+  cache:
+    key:
+      files:
+        - requirements/*.txt
+    paths:
+      - ${PIP_CACHE_DIR}
+      - ${PRE_COMMIT_HOME}
   before_script:
     - apt install git
     - python3 -m pip install -U pip setuptools wheel
