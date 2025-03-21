@@ -76,7 +76,7 @@ build:image-pyqgis-checker:
   before_script:
     - docker --version
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $DOCKER_IMAGE_LATEST || true # retrieve image if it does exist
+    # - docker pull $DOCKER_IMAGE_LATEST || true # retrieve image if it does exist
   script:
     - echo "Building image $DOCKER_IMAGE_NAME"
     - docker build
