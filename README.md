@@ -30,6 +30,33 @@ docker run pyqgis4checker:latest pyqt5_to_pyqt6.py --help
 docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
+## Publish
+
+Image is supposed to be built and published through GitLab CI/CD :
+
+- every commit on default branch = latest
+- every git tag = tag
+
+It's also possible to push the image directly from the local build:
+
+1. First, authenticate to the container registry (a Personal Access Token is required):
+
+    ```sh
+    docker login registry.gitlab.com
+    ```
+
+1. Then build the image tagging with the registry URI:
+
+    ```sh
+    docker build --pull --rm -f 'Dockerfile' -t registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest .
+    ```
+
+1. Push it:
+
+    ```sh
+    docker push registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker
+    ```
+
 ## Lint
 
 Install using pipx:
