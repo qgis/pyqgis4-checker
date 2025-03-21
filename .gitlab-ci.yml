@@ -17,9 +17,9 @@ variables:
   image: docker:28.0.2
   services:
     - docker:28.0.2-dind
-  tags:
-    # - oslandia_docker
-    - oslandia_linux_vm
+  # tags:
+  #   - oslandia_docker
+  #   - oslandia_linux_vm
 
 # -- LINT JOBS ---
 lint:git-hooks:
