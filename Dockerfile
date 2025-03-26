@@ -10,11 +10,11 @@ LABEL Author="Julien M. (Oslandia)"
 FROM fedora:39
 
 # Write .pyc files only once. See: https://stackoverflow.com/a/60797635/2556577
-ENV PYTHONDONTWRITEBYTECODE 1 \
+ENV PYTHONDONTWRITEBYTECODE=1 \
     # Make sure that stdout and stderr are not buffered. See: https://stackoverflow.com/a/59812588/2556577
-    PYTHONUNBUFFERED 0 \
+    PYTHONUNBUFFERED=0 \
     # Remove assert statements and any code conditional on __debug__. See: https://docs.python.org/3/using/cmdline.html#cmdoption-O
-    PYTHONOPTIMIZE 2
+    PYTHONOPTIMIZE=2
 
 # Import generated files from build stage
 COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/output/ /usr/local/
@@ -63,8 +63,8 @@ RUN dnf install --refresh -y \
     && dnf clean all
 
 # Reference QGIS headers and Python packages into the Python environment
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-ENV PYTHONPATH=/usr/local/python:$PYTHONPATH
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
+    PYTHONPATH=/usr/local/python:$PYTHONPATH
 
 # Create non-root user
 RUN useradd -ms /bin/bash pyqgisdev
