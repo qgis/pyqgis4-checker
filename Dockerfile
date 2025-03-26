@@ -12,7 +12,7 @@ FROM fedora:39
 # Write .pyc files only once. See: https://stackoverflow.com/a/60797635/2556577
 ENV PYTHONDONTWRITEBYTECODE 1 \
     # Make sure that stdout and stderr are not buffered. See: https://stackoverflow.com/a/59812588/2556577
-    ENV PYTHONUNBUFFERED 1 \
+    PYTHONUNBUFFERED 0 \
     # Remove assert statements and any code conditional on __debug__. See: https://docs.python.org/3/using/cmdline.html#cmdoption-O
     PYTHONOPTIMIZE 2
 
