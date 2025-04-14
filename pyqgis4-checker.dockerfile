@@ -1,13 +1,55 @@
 # syntax=docker/dockerfile:1.7-labs
 # Required syntax parser to handle --exclude option for COPY instructions
 
-# STAGE: BUILD from QGIS Qt6 image
-FROM oslandia/qgis-master-qt6:latest AS build
+# Arguments to customize build
+ARG LINUX_DISTRO_NAME=fedora
+ARG LINUX_DISTRO_VERSION=39
+ARG QGIS_GIT_VERSION=master
 
-LABEL Author="Julien M. (Oslandia)"
+# STAGE: BUILD from QGIS Qt6 image
+FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as build
+
+ARG QGIS_GIT_VERSION
+
+ENV PUSH_TO_CDASH=true \
+    WITH_QT5=OFF \
+    BUILD_WITH_QT6=ON \
+    WITH_QUICK=ON \
+    WITH_3D=ON \
+    WITH_GRASS7=OFF \
+    WITH_GRASS8=ON \
+    WITH_QTWEBENGINE=ON \
+    WITH_PDF4QT=ON \
+    LD_PRELOAD='' \
+    WITH_CLAZY=OFF \
+    WITH_COMPILE_COMMANDS=OFF \
+    ENABLE_UNITY_BUILDS=ON \
+    CCACHE_DIR=/root/.ccache \
+    SEGFAULT_SIGNALS="abrt segv" \
+    CTEST_BUILD_COMMAND=/usr/bin/ninja \
+    CTEST_PARALLEL_LEVEL=1 \
+    CTEST_SOURCE_DIR=/root/QGIS \
+    CTEST_BUILD_DIR=/root/QGIS/build \
+    QT_VERSION=6 \
+    QGIS_NO_OVERRIDE_IMPORT=1 \
+    QGIS_CONTINUOUS_INTEGRATION_RUN=true \
+    PUSH_TO_CDASH=fals \
+    XDG_RUNTIME_DIR=/tmp \
+    QGIS_MINIO_HOST=minio \
+    QGIS_MINIO_PORT=9000 \
+    QGIS_WEBDAV_HOST=webdav \
+    QGIS_WEBDAV_PORT=80 \
+    TERM=xterm
+
+# clone QGIS source code since it's required to build it
+RUN git clone --depth 1 --single-branch -b ${QGIS_GIT_VERSION} https://github.com/qgis/QGIS.git /root/QGIS/
+
+RUN /root/QGIS/.docker/docker-qgis-build.sh
 
 # STAGE: RUN
-FROM fedora:39
+FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION}
+
+LABEL org.opencontainers.image.authors="qgis+qt6@oslandia.com"
 
 # Write .pyc files only once. See: https://stackoverflow.com/a/60797635/2556577
 ENV PYTHONDONTWRITEBYTECODE=1 \
