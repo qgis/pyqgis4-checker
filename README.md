@@ -13,7 +13,7 @@ Everything described in this procedure must be performed in the [official QGIS r
 Named `qgis-qt6.dockerfile` and placed in `QGIS/.docker`
 
 ```sh
-docker buildx build -f .docker/qgis-qt6.dockerfile -t qgis-master-qt6 .
+docker build -f .docker/qgis-qt6.dockerfile -t qgis-master-qt6 .
 ```
 
 The build is successful. You can connect to the image using:
