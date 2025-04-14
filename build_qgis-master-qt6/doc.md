@@ -1,7 +1,3 @@
----
-title: Create a Docker Image for QGIS Qt6
-tags: qgis, qt6, docker
----
 ## Create a Docker Image for QGIS Qt6
 
 Everything described in this procedure must be performed in the [official QGIS repo](https://github.com/qgis/QGIS).
