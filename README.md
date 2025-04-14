@@ -24,6 +24,8 @@ docker run --rm -v "$(pwd):/home/pyqgisdev/" registry.gitlab.com/oslandia/qgis/p
 Locally, after build:
 
 ```sh
+# print the QGIS version
+docker run pyqgis4checker:latest qgis --version
 # print the help
 docker run pyqgis4checker:latest pyqt5_to_pyqt6.py --help
 # on a folder on the host
