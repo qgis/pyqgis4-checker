@@ -1,16 +1,51 @@
-# PyQGIS 4 Checker
+# QGIS with Qt6 and PyQGIS 4 Checker
 
 [![pipeline status](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/badges/master/pipeline.svg)](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/commits/master)  [![Latest Release](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/badges/release.svg)](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/releases)
 
-Get your QGIS plugin ready for Qt6!
+## Intermediary image: QGIS with Qt6 (Fedora based)
 
-## Build
+## Create a Docker Image for QGIS Qt6
+
+Everything described in this procedure must be performed in the [official QGIS repo](https://github.com/qgis/QGIS).
+
+:warning: Before proceeding, I had to remove `.ci` from `.dockerignore` in my QGIS repository; otherwise, it wouldn't be copied, and the script `/root/QGIS/.docker/docker-qgis-build.sh` requires it.
+
+Named `qgis-qt6.dockerfile` and placed in `QGIS/.docker`
+
+```sh
+docker buildx build -f .docker/qgis-qt6.dockerfile -t qgis-master-qt6 .
+```
+
+The build is successful. You can connect to the image using:
+
+```sh
+docker run -it --rm --name qgis-master-qt6 qgis-master-qt6:latest /bin/bash
+```
+
+To launch QGIS, use the following command:
+
+```sh
+docker run --rm \
+    -i -t \
+    -v ${HOME}:/home/${USER} \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e DISPLAY=${DISPLAY} \
+    --net=host \
+    -e LD_LIBRARY_PATH=/root/QGIS/build/output/lib \
+    qgis-qt6 /root/QGIS/build/output/bin/qgis
+```
+
+## PyQGIS4 Checker
+
+Get your QGIS plugin ready for QGIS 4 (QGIS based on Qt6)!
+
+### Build
 
 ```sh
 docker build --pull --rm -f 'Dockerfile' -t 'pyqgis4checker:latest' '.'
 ```
 
-## Run it
+### Run it
 
 Using the published image:
 
@@ -32,7 +67,7 @@ docker run pyqgis4checker:latest pyqt5_to_pyqt6.py --help
 docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
-## Publish
+### Publish
 
 Image is supposed to be built and published through GitLab CI/CD :
 
@@ -59,7 +94,9 @@ It's also possible to push the image directly from the local build:
     docker push registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker
     ```
 
-## Lint
+## Contributing
+
+### Lint
 
 Install using pipx:
 
