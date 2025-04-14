@@ -84,6 +84,8 @@ jobs:
         id: main_build_push
         uses: docker/build-push-action@v6.15.0
         with:
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           context: .
           push: true
           tags: ${{ steps.main_meta.outputs.tags }}
