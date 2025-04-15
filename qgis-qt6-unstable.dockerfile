@@ -94,11 +94,13 @@ RUN dnf install --nodocs --refresh --setopt=install_weak_deps=False -y \
     qwt-qt6 \
     spatialindex \
     util-linux \
+    # locale generation
+    glibc-langpack-en \
+    localedef -i en_US -f UTF-8 en_US.UTF-8 || true \
+    dnf remove glibc-langpack-en \
     # clean up
+    && dnf autoremove -y \
     && dnf clean all
-
-# Set locales to avoid Qt messing up with encoding
-RUN localedef -i en_US -f UTF-8 en_US.UTF-8 || true
 
 # Reference QGIS headers and Python packages into the Python environment
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
