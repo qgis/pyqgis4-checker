@@ -11,35 +11,28 @@ FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as build
 
 ARG QGIS_GIT_VERSION
 
-ENV PUSH_TO_CDASH=true \
-    WITH_QT5=OFF \
-    BUILD_WITH_QT6=ON \
-    WITH_QUICK=ON \
-    WITH_3D=ON \
-    WITH_GRASS7=OFF \
-    WITH_GRASS8=ON \
-    WITH_QTWEBENGINE=ON \
-    WITH_PDF4QT=ON \
+ENV BUILD_WITH_QT6=ON \
+    CCACHE_DIR=/root/.ccache \
+    CTEST_BUILD_COMMAND=/usr/bin/ninja \
+    CTEST_BUILD_DIR=/root/QGIS/build \
+    CTEST_SOURCE_DIR=/root/QGIS \
+    ENABLE_UNITY_BUILDS=ON \
     LD_PRELOAD='' \
+    QGIS_CONTINUOUS_INTEGRATION_RUN=true \
+    QGIS_NO_OVERRIDE_IMPORT=1 \
+    QT_VERSION=6 \
+    SEGFAULT_SIGNALS="abrt segv" \
+    TERM=xterm \
+    WITH_3D=ON \
     WITH_CLAZY=OFF \
     WITH_COMPILE_COMMANDS=OFF \
-    ENABLE_UNITY_BUILDS=ON \
-    CCACHE_DIR=/root/.ccache \
-    SEGFAULT_SIGNALS="abrt segv" \
-    CTEST_BUILD_COMMAND=/usr/bin/ninja \
-    CTEST_PARALLEL_LEVEL=1 \
-    CTEST_SOURCE_DIR=/root/QGIS \
-    CTEST_BUILD_DIR=/root/QGIS/build \
-    QT_VERSION=6 \
-    QGIS_NO_OVERRIDE_IMPORT=1 \
-    QGIS_CONTINUOUS_INTEGRATION_RUN=true \
-    PUSH_TO_CDASH=false \
-    XDG_RUNTIME_DIR=/tmp \
-    QGIS_MINIO_HOST=minio \
-    QGIS_MINIO_PORT=9000 \
-    QGIS_WEBDAV_HOST=webdav \
-    QGIS_WEBDAV_PORT=80 \
-    TERM=xterm
+    WITH_GRASS7=OFF \
+    WITH_GRASS8=ON \
+    WITH_PDF4QT=ON \
+    WITH_QT5=OFF \
+    WITH_QTWEBENGINE=ON \
+    WITH_QUICK=ON \
+    XDG_RUNTIME_DIR=/tmp
 
 # clone QGIS source code and launch QGIS build
 RUN --mount=type=cache,target=/root/.ccache \
