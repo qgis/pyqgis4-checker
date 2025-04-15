@@ -48,6 +48,14 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # This action will create and boot a builder that can be used in the following 
+      # steps of your workflow if you're using Buildx or the build-push action.
+      # By default, the docker-container driver will be used to be able to build 
+      # multi-platform images and export cache using a BuildKit container.
+      # Required to use cache-from/to in following steps
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build image (PR)
         id: pr_build
@@ -84,6 +92,8 @@ jobs:
         id: main_build_push
         uses: docker/build-push-action@v6.15.0
         with:
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           context: .
           push: true
           tags: ${{ steps.main_meta.outputs.tags }}
