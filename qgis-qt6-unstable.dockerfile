@@ -63,7 +63,7 @@ COPY --from=build /root/QGIS/build/usr/lib/ /usr/lib/
 ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5_to_pyqt6/pyqt5_to_pyqt6.py /usr/local/bin/
 
 # Install required dependencies
-RUN dnf install --refresh -y \
+RUN dnf install --nodocs --refresh -y \
     draco \
     gdal \
     gdal-python-tools \
