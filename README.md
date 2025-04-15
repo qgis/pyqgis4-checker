@@ -18,7 +18,7 @@ This repository aims to provide developers with tools for the migration of QGIS 
 ### Build
 
 ```sh
-docker build --pull --rm -f qgis-qt6-unstable.dockerfile \
+docker buildx build --pull --rm -f qgis-qt6-unstable.dockerfile \
     --cache-from type=local,src=/tmp/docker-cache \
     --cache-to type=local,dest=/tmp/docker-cache,mode=max \
     --progress=plain \
@@ -42,6 +42,8 @@ xhost +local:docker
 # launch QGIS from inside the Docker and stream the display with x11 to your host
 docker run -it --rm \
   -e DISPLAY=$DISPLAY \
+  -e LC_ALL=C.utf8 \
+  -e LANG=C.utf8 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   qgis-qt6-unstable:latest \
   qgis
