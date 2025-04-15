@@ -72,6 +72,7 @@ jobs:
           buildkitd-config-inline: |
             [worker.oci]
               max-parallelism = 4
+              network = "cni"
 
       - name: Build image (PR)
         id: pr_build
