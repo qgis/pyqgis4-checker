@@ -15,7 +15,24 @@ This repository aims to provide developers with tools for the migration of QGIS 
 
 ## QGIS with Qt6 (Fedora based)
 
+Test QGIS Desktop with Qt6 running within a Docker container.
+
 ### Build
+
+Classic:
+
+```sh
+docker build --pull --rm -f qgis-qt6-unstable.dockerfile \
+    --progress=plain \
+    --build-arg QGIS_GIT_VERSION=master \
+    -t qgis-qt6-unstable:latest .
+```
+
+With BuildKit and advanced cache:
+
+```sh
+docker buildx create --name qgisbuilder --driver docker-container --use
+```
 
 ```sh
 docker buildx build --pull --rm -f qgis-qt6-unstable.dockerfile \
@@ -26,7 +43,7 @@ docker buildx build --pull --rm -f qgis-qt6-unstable.dockerfile \
     -t qgis-qt6-unstable:latest .
 ```
 
-### Run
+### Run local image
 
 Get into the container:
 
@@ -46,6 +63,29 @@ docker run -it --rm \
   -e LANG=C.utf8 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   qgis-qt6-unstable:latest \
+  qgis
+```
+
+### Run publshed image
+
+Get into the container:
+
+```sh
+docker run -it --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
+```
+
+To launch QGIS from the host, use the following command (requires a x11 server):
+
+```sh
+# authorize the docker user to x11
+xhost +local:docker
+# launch QGIS from inside the Docker and stream the display with x11 to your host
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -e LC_ALL=C.utf8 \
+  -e LANG=C.utf8 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  ghcr.io/qgis/qgis-qt6-unstable:main \
   qgis
 ```
 
