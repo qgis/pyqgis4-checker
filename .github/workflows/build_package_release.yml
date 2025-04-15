@@ -26,7 +26,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: qgis-qt6-unstable
+      IMAGE_NAME: qgis/qgis-qt6-unstable
       DOCKERFILE_PATH: qgis-qt6-unstable.dockerfile
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
