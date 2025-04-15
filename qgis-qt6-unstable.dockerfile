@@ -96,16 +96,18 @@ RUN dnf install --refresh -y \
     # clean up
     && dnf clean all
 
-# Reference QGIS headers and Python packages into the Python environment
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
-    PYTHONPATH=/usr/local/python:$PYTHONPATH
-
 # Set locales to avoid Qt messing up with encoding
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 || true
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+
+# Reference QGIS headers and Python packages into the Python environment
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
+    PYTHONPATH=/usr/local/python:$PYTHONPATH \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 # Create non-root user
+# -m -> Create the user's home directory
+# -s /bin/bash -> Set as the user's 
 RUN useradd -ms /bin/bash qgis-user -p "$(openssl passwd -1 qgis4qt6)"
 USER qgis-user
 WORKDIR /home/qgis-user
