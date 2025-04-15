@@ -6,7 +6,7 @@ ARG LINUX_DISTRO_NAME=fedora
 ARG LINUX_DISTRO_VERSION=39
 ARG QGIS_GIT_VERSION=master
 
-# STAGE: BUILD from QGIS Qt6 image
+# -- STAGE: BUILD from QGIS Qt6 image
 FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as build
 
 ARG QGIS_GIT_VERSION
@@ -33,7 +33,7 @@ ENV PUSH_TO_CDASH=true \
     QT_VERSION=6 \
     QGIS_NO_OVERRIDE_IMPORT=1 \
     QGIS_CONTINUOUS_INTEGRATION_RUN=true \
-    PUSH_TO_CDASH=fals \
+    PUSH_TO_CDASH=false \
     XDG_RUNTIME_DIR=/tmp \
     QGIS_MINIO_HOST=minio \
     QGIS_MINIO_PORT=9000 \
@@ -41,12 +41,14 @@ ENV PUSH_TO_CDASH=true \
     QGIS_WEBDAV_PORT=80 \
     TERM=xterm
 
-# clone QGIS source code since it's required to build it
-RUN git clone --depth 1 --single-branch -b ${QGIS_GIT_VERSION} https://github.com/qgis/QGIS.git /root/QGIS/
+# clone QGIS source code and launch QGIS build
+RUN --mount=type=cache,target=/root/.ccache \
+    ccache --show-stats \
+    && git clone --depth 1 --filter=blob:none --single-branch -b ${QGIS_GIT_VERSION} https://github.com/qgis/QGIS.git /root/QGIS/ \
+    && rm -rf /root/QGIS/.git \
+    && /root/QGIS/.docker/docker-qgis-build.sh
 
-RUN /root/QGIS/.docker/docker-qgis-build.sh
-
-# STAGE: RUN
+# -- STAGE: RUN
 FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION}
 
 LABEL org.opencontainers.image.authors="qgis+qt6@oslandia.com"
@@ -105,7 +107,12 @@ RUN dnf install --refresh -y \
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
     PYTHONPATH=/usr/local/python:$PYTHONPATH
 
+# Set locales to avoid Qt messing up with encoding
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8 || true
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
 # Create non-root user
-RUN useradd -ms /bin/bash qgis-user
+RUN useradd -ms /bin/bash qgis-user -p "$(openssl passwd -1 qgis4qt6)"
 USER qgis-user
 WORKDIR /home/qgis-user
