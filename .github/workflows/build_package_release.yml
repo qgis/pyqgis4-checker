@@ -71,8 +71,7 @@ jobs:
           driver: docker-container
           buildkitd-config-inline: |
             [worker.oci]
-              max-parallelism = 4
-              network = "cni"
+            max-parallelism = 4
 
       - name: Build image (PR)
         id: pr_build
@@ -82,7 +81,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
-          file: $DOCKERFILE_PATH
+          file: ${{ env.DOCKERFILE_PATH }}
           load: true
           push: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
@@ -115,7 +114,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
-          file: $DOCKERFILE_PATH
+          file: ${{ env.DOCKERFILE_PATH }}
           push: true
           tags: ${{ steps.main_meta.outputs.tags }}
           labels: ${{ steps.main_meta.outputs.labels }}
