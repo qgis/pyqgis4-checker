@@ -44,7 +44,8 @@ RUN --mount=type=cache,target=/root/.ccache \
 # -- STAGE: RUN
 FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION}
 
-LABEL org.opencontainers.image.authors="qgis+qt6@oslandia.com"
+LABEL org.opencontainers.image.authors="qgis@oslandia.com"
+LABEL org.opencontainers.image.description="QGIS built with Qt6 from source code. Not suitable for production, only for end-users testing and PyQGIS developers testing."
 
 # Write .pyc files only once. See: https://stackoverflow.com/a/60797635/2556577
 ENV PYTHONDONTWRITEBYTECODE=1 \
