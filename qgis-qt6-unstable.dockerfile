@@ -38,7 +38,7 @@ ENV BUILD_WITH_QT6=ON \
     XDG_RUNTIME_DIR=/tmp
 
 # clone QGIS source code and launch QGIS build
-RUN --mount=type=cache,target=/root/.ccache \
+RUN --mount=type=cache,target=/tmp/ccache \
     ccache --show-stats \
     && git clone --depth 1 --filter=blob:none --single-branch -b ${QGIS_GIT_VERSION} https://github.com/qgis/QGIS.git /root/QGIS/ \
     && rm -rf /root/QGIS/.git \
