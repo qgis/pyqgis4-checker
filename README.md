@@ -1,6 +1,6 @@
 # QGIS with Qt6 and PyQGIS 4 Checker
 
-[![pipeline status](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/badges/main/pipeline.svg)](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/commits/main)  [![Latest Release](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/badges/release.svg)](https://gitlab.com/Oslandia/qgis/pyqgis-4-checker/-/releases)
+[![📦 Build & 🚀 Release](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml/badge.svg)](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml)  [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/qgis/pyqgis4-checker/main.svg)](https://results.pre-commit.ci/latest/github/qgis/pyqgis4-checker/main)
 
 This repository aims to provide developers with tools for the migration of QGIS from Qt5 to Qt6, including a version bump to QGIS 4. It contains 2 docker images:
 
@@ -17,7 +17,7 @@ This repository aims to provide developers with tools for the migration of QGIS 
 
 Test QGIS Desktop with Qt6 running within a Docker container.
 
-### Build
+### Build locally
 
 Classic:
 
@@ -35,12 +35,34 @@ docker buildx create --name qgisbuilder --driver docker-container --use
 ```
 
 ```sh
-docker buildx build --pull --rm -f qgis-qt6-unstable.dockerfile \
-    --cache-from type=local,src=/tmp/docker-cache \
-    --cache-to type=local,dest=/tmp/docker-cache,mode=max \
-    --progress=plain \
+docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
+    --build-arg CCACHE_DIR=/root/.ccache \
     --build-arg QGIS_GIT_VERSION=master \
+    --cache-from type=local,src=.cache/docker/qgis/ \
+    --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:main \
+    --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
+    --load \
+    --platform linux/amd64 \
     -t qgis-qt6-unstable:latest .
+```
+
+> [!NOTE] 
+> This command store a local cache under .cache/docker/qgis/. If you need to save disk space, clen up this folder. Alternatively, you can set it to a temporary folder i.e. `/tmp/docker/cache`.
+
+#### Build only the RUN stage
+
+It's also possible to reuse the QGIS build directly, saving a lot of time:
+
+```sh
+docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
+  --target stage-run \
+  --build-arg BASE_RUN_IMAGE=ghcr.io/qgis/qgis-qt6-unstable:main \
+  --cache-from type=local,src=.cache/docker/qgis/ \
+  --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:main \
+  --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
+  --load \
+  --platform linux/amd64 \
+  -t qgis-qt6-unstable:latest .
 ```
 
 ### Run local image
@@ -66,12 +88,12 @@ docker run -it --rm \
   qgis
 ```
 
-### Run publshed image
+### Run published image
 
 Get into the container:
 
 ```sh
-docker run -it --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
+docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
 ```
 
 To launch QGIS from the host, use the following command (requires a x11 server):
@@ -93,10 +115,12 @@ docker run -it --rm \
 
 Get your QGIS plugin ready for QGIS 4 using the migration script to check your code against PyQGIS 4 and PyQt6.
 
-### Build
+### Build locally
 
 ```sh
-docker build --pull --rm -f 'Dockerfile' -t 'pyqgis4checker:latest' '.'
+docker buildx build --pull --rm --file pyqgis4-checker.dockerfile
+  --load
+  --tag pyqgis4-checker:latest .
 ```
 
 ### Run it
@@ -114,11 +138,11 @@ Locally, after build:
 
 ```sh
 # print the QGIS version
-docker run pyqgis4checker:latest qgis --version
+docker run pyqgis4-checker:latest qgis --version
 # print the help
-docker run pyqgis4checker:latest pyqt5_to_pyqt6.py --help
+docker run pyqgis4-checker:latest pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Publish
