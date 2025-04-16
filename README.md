@@ -57,7 +57,7 @@ Classic:
 docker build --pull --rm -f qgis-qt6-unstable.dockerfile \
     --progress=plain \
     --build-arg QGIS_GIT_VERSION=master \
-    -t qgis-qt6-unstable:latest .
+    -t qgis-qt6-unstable:local .
 ```
 
 With BuildKit and advanced cache:
@@ -71,11 +71,11 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
     --build-arg CCACHE_DIR=/root/.ccache \
     --build-arg QGIS_GIT_VERSION=master \
     --cache-from type=local,src=.cache/docker/qgis/ \
-    --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:main \
+    --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache \
     --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
     --load \
     --platform linux/amd64 \
-    -t qgis-qt6-unstable:latest .
+    -t qgis-qt6-unstable:local .
 ```
 
 > [!NOTE]
@@ -83,14 +83,14 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
 
 #### Build only the RUN stage
 
-It's also possible to reuse the QGIS build directly, saving a lot of time:
+It's also possible to reuse the build cache directly local and remote, saving a lot of time:
 
 ```sh
 docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
   --target stage-run \
   --build-arg BASE_RUN_IMAGE=ghcr.io/qgis/qgis-qt6-unstable:main \
   --cache-from type=local,src=.cache/docker/qgis/ \
-  --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:main \
+  --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache \
   --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
   --load \
   --platform linux/amd64 \
@@ -102,7 +102,7 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
 Get into the container:
 
 ```sh
-docker run -it --rm --name qgis-qt6 qgis-qt6-unstable:latest /bin/bash
+docker run -it --rm --name qgis-qt6 qgis-qt6-unstable:main /bin/bash
 ```
 
 To launch QGIS from the host, use the following command (requires a x11 server):
@@ -116,7 +116,7 @@ docker run -it --rm \
   -e LC_ALL=C.utf8 \
   -e LANG=C.utf8 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  qgis-qt6-unstable:latest \
+  qgis-qt6-unstable:main \
   qgis
 ```
 
@@ -129,7 +129,7 @@ Get your QGIS plugin ready for QGIS 4 using the migration script to check your c
 ```sh
 docker buildx build --pull --rm --file pyqgis4-checker.dockerfile
   --load
-  --tag pyqgis4-checker:latest .
+  --tag pyqgis4-checker:main .
 ```
 
 ### Run it
