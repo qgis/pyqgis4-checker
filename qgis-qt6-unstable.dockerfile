@@ -95,11 +95,12 @@ RUN dnf install --nodocs --refresh --setopt=install_weak_deps=False -y \
     util-linux \
     # locale generation
     glibc-langpack-en \
-    localedef -i en_US -f UTF-8 en_US.UTF-8 || true \
-    dnf remove glibc-langpack-en \
+    && localedef -i en_US -f UTF-8 en_US.UTF-8 || true \
+    && dnf remove -y glibc-langpack-en \
     # clean up
     && dnf autoremove -y \
-    && dnf clean all
+    && dnf clean all \
+    && rm -rf /var/cache/dnf/*
 
 # Reference QGIS headers and Python packages into the Python environment
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
