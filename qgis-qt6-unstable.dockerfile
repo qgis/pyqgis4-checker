@@ -7,7 +7,7 @@
 ARG LINUX_DISTRO_NAME=fedora
 ARG LINUX_DISTRO_VERSION=39
 ARG QGIS_GIT_VERSION=master
-
+ARG BASE_RUN_IMAGE=stage-build
 
 # -- STAGE: BUILD from QGIS Qt6 image
 FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as stage-build
@@ -62,7 +62,7 @@ COPY --from=stage-build --exclude=share/qgis/i18n/* --exclude=share/qgis/resourc
 COPY --from=stage-build /root/QGIS/build/usr/lib/ /usr/lib/
 
 # Install required dependencies
-RUN dnf install --nodocs --refresh --setopt=install_weak_deps=False -y \
+RUN dnf install --nodocs --refresh -y \
     draco \
     gdal \
     gdal-python-tools \
@@ -96,7 +96,7 @@ RUN dnf install --nodocs --refresh --setopt=install_weak_deps=False -y \
     # locale generation
     glibc-langpack-en \
     && localedef -i en_US -f UTF-8 en_US.UTF-8 || true \
-    && dnf remove -y glibc-langpack-en \
+    # && dnf remove -y glibc-langpack-en \
     # clean up
     && dnf autoremove -y \
     && dnf clean all \
@@ -110,10 +110,14 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
 
 # Create non-root user
 # -m -> Create the user's home directory
-# -s /bin/bash -> Set as the user's 
+# -s /bin/bash -> Set as the user's
 RUN useradd -ms /bin/bash quser \
     && groupadd -f wheel \
     && usermod -aG wheel quser \
     && echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER quser
 WORKDIR /home/quser
+
+# # -- STAGE: switchable RUN
+# FROM ${BASE_RUN_IMAGE} AS run-from-image
+# FROM stage-run AS run-fallback
