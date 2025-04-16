@@ -64,9 +64,11 @@ jobs:
 
       - name: Cache ccache (QGIS compilation)
         uses: actions/cache@v4
+        env:
+          DOCKERFILE_PATH: ${{ env.DOCKERFILE_PATH }}
         with:
           path: /tmp/ccache
-          key: ${{ runner.os }}-ccache-${{ hashFiles('*.dockerfile') }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles(env.DOCKERFILE_PATH) }}
           restore-keys: |
             ${{ runner.os }}-ccache-
 
