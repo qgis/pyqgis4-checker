@@ -46,7 +46,7 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
     -t qgis-qt6-unstable:latest .
 ```
 
-> [!NOTE] 
+> [!NOTE]
 > This command store a local cache under .cache/docker/qgis/. If you need to save disk space, clen up this folder. Alternatively, you can set it to a temporary folder i.e. `/tmp/docker/cache`.
 
 #### Build only the RUN stage
@@ -129,9 +129,9 @@ Using the published image:
 
 ```sh
 # print the help
-docker run registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest pyqt5_to_pyqt6.py --help
+docker run docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm -v "$(pwd):/home/pyqgisdev/" docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 Locally, after build:
@@ -163,14 +163,14 @@ It's also possible to push the image directly from the local build:
 1. Then build the image tagging with the registry URI:
 
     ```sh
-    docker build --pull --rm -f 'Dockerfile' -t registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest .
+    docker build --pull --rm -f 'Dockerfile' -t docker pull ghcr.io/qgis/pyqgis4-checker:main:main .
     ```
 
 1. Push it:
 
     ```sh
-    docker push registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker
-    ```
+    docker push docker pull ghcr.io/qgis/pyqgis4-checker:main
+main`
 
 ## Contributing
 
