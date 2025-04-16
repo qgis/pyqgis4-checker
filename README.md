@@ -1,6 +1,6 @@
 # QGIS with Qt6 and PyQGIS 4 Checker
 
-[![📦 Build & 🚀 Release](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml/badge.svg)](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml)  [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/qgis/pyqgis4-checker/main.svg)](https://results.pre-commit.ci/latest/github/qgis/pyqgis4-checker/main)
+[![📦 Build & 🚀 Release](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml/badge.svg)](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/qgis/pyqgis4-checker/main.svg)](https://results.pre-commit.ci/latest/github/qgis/pyqgis4-checker/main)
 
 This repository aims to provide developers with tools for the migration of QGIS from Qt5 to Qt6, including a version bump to QGIS 4. It contains 2 docker images:
 
@@ -16,6 +16,38 @@ This repository aims to provide developers with tools for the migration of QGIS 
 ## QGIS with Qt6 (Fedora based)
 
 Test QGIS Desktop with Qt6 running within a Docker container.
+
+### Tagging Strategy
+
+| Event                   | Docker tag applied              | Description                                                      |
+| :---------------------- | :-----------------------------: | :--------------------------------------------------------------- |
+| Commit on `main` branch | `main`                          | Development image, always up to date with QGIS main branch.      |
+| Git tag (e.g. `3.40.5`) | `3.40.5`                        | Image matching an official QGIS release.                         |
+| Latest published tag    | `latest`                        | Always synchronized with the most recently published tagged version.     |
+| Build cache export      | `cache`                         | Special tag used to store Docker build cache layers. Not for direct use. |
+
+### Run published image
+
+Get into the container:
+
+```sh
+docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
+```
+
+To launch QGIS from the host, use the following command (requires a x11 server):
+
+```sh
+# authorize the docker user to x11
+xhost +local:docker
+# launch QGIS from inside the Docker and stream the display with x11 to your host
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -e LC_ALL=C.utf8 \
+  -e LANG=C.utf8 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  ghcr.io/qgis/qgis-qt6-unstable:main \
+  qgis
+```
 
 ### Build locally
 
@@ -88,29 +120,6 @@ docker run -it --rm \
   qgis
 ```
 
-### Run published image
-
-Get into the container:
-
-```sh
-docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
-```
-
-To launch QGIS from the host, use the following command (requires a x11 server):
-
-```sh
-# authorize the docker user to x11
-xhost +local:docker
-# launch QGIS from inside the Docker and stream the display with x11 to your host
-docker run -it --rm \
-  -e DISPLAY=$DISPLAY \
-  -e LC_ALL=C.utf8 \
-  -e LANG=C.utf8 \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  ghcr.io/qgis/qgis-qt6-unstable:main \
-  qgis
-```
-
 ## PyQGIS4 Checker
 
 Get your QGIS plugin ready for QGIS 4 using the migration script to check your code against PyQGIS 4 and PyQt6.
@@ -170,6 +179,7 @@ It's also possible to push the image directly from the local build:
 
     ```sh
     docker push docker pull ghcr.io/qgis/pyqgis4-checker:main
+
 main`
 
 ## Contributing
