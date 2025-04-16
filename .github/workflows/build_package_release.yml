@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       qgis_version:
-        description: 'QGIS version/tag (ex: master, final-3_40_5)'
+        description: "QGIS version/tag (ex: master, final-3_40_5)"
         required: true
         default: master
 
@@ -85,27 +85,6 @@ jobs:
             [worker.oci]
             max-parallelism = 4
 
-      - name: Build image (PR)
-        id: pr_build
-        if: github.event_name == 'pull_request'
-        uses: docker/build-push-action@v6.15.0
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          context: .
-          file: ${{ env.DOCKERFILE_PATH }}
-          load: true
-          push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
-
-      - name: Test image (PR)
-        id: pr_test
-        if: github.event_name == 'pull_request'
-        run: |
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} pyqt5_to_pyqt6.py --help
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
-
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about)
       # to extract tags and labels that will be applied to the specified image.
       # The `id` "meta" allows the output of this step to be referenced in a subsequent step.
@@ -123,28 +102,48 @@ jobs:
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see [Usage](https://github.com/docker/build-push-action#usage) in the README of the `docker/build-push-action` repository.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
-      - name: Build and push Docker image
-        id: main_build_push
+      - name: Build Docker image
+        id: main_build
         uses: docker/build-push-action@v6.15.0
         with:
+          annotations: ${{ steps.main_meta.outputs.annotations }}
           build-args: |
             QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
             type=gha
-            type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache,mode=max
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
+          load: true
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
+
+      - name: Test image
+        id: qgis_test
+        run: |
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test qgis --version
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
+
+      - name: Push Docker image
+        id: main_push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6.15.0
+        with:
+          annotations: ${{ steps.main_meta.outputs.annotations }}
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}
+          load: false
           push: true
           tags: ${{ steps.main_meta.outputs.tags }}
           labels: ${{ steps.main_meta.outputs.labels }}
 
-      # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built. It increases supply chain security for people who consume the image. For more information, see [Using artifact attestations to establish provenance for builds](/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
+      # Generates an artifact attestation for the image which is an unforgeable statement about where and how it was built. It increases supply chain security for people who consume the image. For more information, see [Using artifact attestations to establish provenance for builds](/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.main_build_push.outputs.digest }}
+          subject-digest: ${{ steps.main_build.outputs.digest }}
           push-to-registry: true
