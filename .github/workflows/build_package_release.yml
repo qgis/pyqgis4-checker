@@ -115,10 +115,10 @@ jobs:
             QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
             type=gha
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           load: true
@@ -202,10 +202,10 @@ jobs:
           annotations: ${{ steps.checker_meta.outputs.annotations }}
           cache-from: |
             type=gha
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           load: true
@@ -226,10 +226,10 @@ jobs:
           annotations: ${{ steps.checker_meta.outputs.annotations }}
           cache-from: |
             type=gha
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           load: false
