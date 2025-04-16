@@ -111,8 +111,12 @@ jobs:
         id: main_build_push
         uses: docker/build-push-action@v6.15.0
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha
+            type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           push: true
