@@ -110,9 +110,9 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
 # Create non-root user
 # -m -> Create the user's home directory
 # -s /bin/bash -> Set as the user's 
-RUN useradd -ms /bin/bash quser --disabled-login \
-    && adduser quser sudo \
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
-    /etc/sudoers
+RUN useradd -ms /bin/bash quser \
+    && groupadd -f wheel \
+    && usermod -aG wheel quser \
+    && echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER quser
 WORKDIR /home/quser
