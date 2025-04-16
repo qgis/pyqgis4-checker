@@ -1,13 +1,16 @@
 # syntax=docker/dockerfile:1.7-labs
 # Required syntax parser to handle --exclude option for COPY instructions
 
+# -- GLOBAL
+
 # Arguments to customize build
 ARG LINUX_DISTRO_NAME=fedora
 ARG LINUX_DISTRO_VERSION=39
 ARG QGIS_GIT_VERSION=master
 
+
 # -- STAGE: BUILD from QGIS Qt6 image
-FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as build
+FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as stage-build
 
 ARG QGIS_GIT_VERSION
 
@@ -42,7 +45,7 @@ RUN --mount=type=cache,target=/root/.ccache \
     && /root/QGIS/.docker/docker-qgis-build.sh
 
 # -- STAGE: RUN
-FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION}
+FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION} as stage-run
 
 LABEL org.opencontainers.image.authors="qgis@oslandia.com"
 LABEL org.opencontainers.image.description="QGIS built with Qt6 from source code. Not suitable for production, only for end-users testing and PyQGIS developers testing."
@@ -55,12 +58,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONOPTIMIZE=2
 
 # Import generated files from build stage
-COPY --from=build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/output/ /usr/local/
-COPY --from=build /root/QGIS/build/usr/lib/ /usr/lib/
-
-# TEMPORARY: GET THE LATEST SCRIPT VERSION WAITING FOR SOURCE IMAGE TO BE UPDATED
-# COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
-ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5_to_pyqt6/pyqt5_to_pyqt6.py /usr/local/bin/
+COPY --from=stage-build --exclude=share/qgis/i18n/* --exclude=share/qgis/resources/data/* /root/QGIS/build/output/ /usr/local/
+COPY --from=stage-build /root/QGIS/build/usr/lib/ /usr/lib/
 
 # Install required dependencies
 RUN dnf install --nodocs --refresh --setopt=install_weak_deps=False -y \
