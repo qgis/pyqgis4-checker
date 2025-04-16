@@ -96,6 +96,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
@@ -146,4 +147,96 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.main_build.outputs.digest }}
+          push-to-registry: true
+
+  docker-pyqgis4-checker:
+    name: "🐳 Build PyQGIS4 Checker image"
+    runs-on: ubuntu-latest
+    needs: docker-qgis-qt6
+
+    env:
+      DOCKERFILE_PATH: pyqgis4-checker.dockerfile
+      IMAGE_NAME: ${{ github.repository_owner }}/pyqgis4-checker
+      REGISTRY: ghcr.io
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: checker_meta
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build Docker image
+        id: checker_build
+        uses: docker/build-push-action@v6.15.0
+        with:
+          annotations: ${{ steps.checker_meta.outputs.annotations }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}
+          load: true
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
+
+      - name: Test image
+        run: |
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test pyqt5_to_pyqt6.py --help
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
+
+      - name: Push Docker image
+        id: checker_push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6.15.0
+        with:
+          annotations: ${{ steps.checker_meta.outputs.annotations }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}
+          load: false
+          push: true
+          tags: ${{ steps.checker_meta.outputs.tags }}
+          labels: ${{ steps.checker_meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.checker_push.outputs.digest }}
           push-to-registry: true
