@@ -19,6 +19,11 @@ on:
         required: true
         default: master
 
+# Allow one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 # Globals
 env:
   LINUX_DISTRIBUTION_NAME: fedora
