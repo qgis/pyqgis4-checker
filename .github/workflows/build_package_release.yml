@@ -13,6 +13,11 @@ on:
       - main
 
   workflow_dispatch:
+    inputs:
+      qgis_version:
+        description: 'QGIS version/tag (ex: master, final-3_40_5)'
+        required: true
+        default: master
 
 # Globals
 env:
@@ -25,9 +30,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository_owner }}/qgis-qt6-unstable
       DOCKERFILE_PATH: qgis-qt6-unstable.dockerfile
+      IMAGE_NAME: ${{ github.repository_owner }}/qgis-qt6-unstable
+      REGISTRY: ghcr.io
+      QGIS_GIT_VERSION: >
+        ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version ||
+            github.ref_type == 'tag' && github.ref_name ||
+            github.ref_type == 'branch' && github.ref_name ||
+            'master' }}
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -115,6 +125,8 @@ jobs:
         id: main_build_push
         uses: docker/build-push-action@v6.15.0
         with:
+          build-args: |
+            QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
             type=gha
             type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache
