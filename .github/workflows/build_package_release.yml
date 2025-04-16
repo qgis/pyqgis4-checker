@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       qgis_version:
-        description: "QGIS version/tag (ex: master, final-3_40_5)"
+        description: "Tag for qgis/qgis3-qt6-build-deps-bin-only base image"
         required: true
         default: master
 
@@ -35,8 +35,6 @@ jobs:
       REGISTRY: ghcr.io
       QGIS_GIT_VERSION: >
         ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version ||
-            github.ref_type == 'tag' && github.ref_name ||
-            github.ref_type == 'branch' && github.ref_name ||
             'master' }}
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
