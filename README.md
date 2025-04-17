@@ -94,7 +94,7 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
   --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
   --load \
   --platform linux/amd64 \
-  -t qgis-qt6-unstable:latest .
+  -t qgis-qt6-unstable:local .
 ```
 
 ### Run local image
@@ -102,7 +102,7 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
 Get into the container:
 
 ```sh
-docker run -it --rm --name qgis-qt6 qgis-qt6-unstable:main /bin/bash
+docker run -it --rm --name qgis-qt6 qgis-qt6-unstable:local /bin/bash
 ```
 
 To launch QGIS from the host, use the following command (requires a x11 server):
@@ -124,69 +124,67 @@ docker run -it --rm \
 
 Get your QGIS plugin ready for QGIS 4 using the migration script to check your code against PyQGIS 4 and PyQt6.
 
+### Run the published image
+
+```sh
+# print the help
+docker run --rm --pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
+# on a folder on the host
+docker run --rm -v "$(pwd):/home/pyqgisdev/" docker pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+```
+
 ### Build locally
 
 ```sh
-docker buildx build --pull --rm --file pyqgis4-checker.dockerfile
-  --load
-  --tag pyqgis4-checker:main .
+docker buildx build --pull --rm --file pyqgis4-checker.dockerfile \
+  --cache-from type=local,src=.cache/docker/qgis/ \
+  --cache-from type=registry,ref=ghcr.io/qgis/pyqgis4-checker:cache \
+  --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
+  --load \
+  --progress plain \
+  --tag pyqgis4-checker:local .
 ```
 
-### Run it
-
-Using the published image:
-
-```sh
-# print the help
-docker run docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --help
-# on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
-```
-
-Locally, after build:
+### Run local image
 
 ```sh
 # print the QGIS version
-docker run pyqgis4-checker:latest qgis --version
+docker run pyqgis4-checker:local qgis --version
 # print the help
-docker run pyqgis4-checker:latest pyqt5_to_pyqt6.py --help
+docker run pyqgis4-checker:local pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:latest pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Publish
 
-Image is supposed to be built and published through GitLab CI/CD :
-
-- every commit on default branch = latest
-- every git tag = tag
+Images are supposed to be built and published through GitHub Actions (see [Tagging strategy](#tagging-strategy)):
 
 It's also possible to push the image directly from the local build:
 
 1. First, authenticate to the container registry (a Personal Access Token is required):
 
     ```sh
-    docker login registry.gitlab.com
+    docker login ghcr.github.io
     ```
 
 1. Then build the image tagging with the registry URI:
 
     ```sh
-    docker build --pull --rm -f 'Dockerfile' -t docker pull ghcr.io/qgis/pyqgis4-checker:main:main .
+    docker build --pull --rm -f 'Dockerfile' -t docker pull ghcr.io/qgis/pyqgis4-checker:main .
     ```
 
 1. Push it:
 
     ```sh
     docker push docker pull ghcr.io/qgis/pyqgis4-checker:main
-
-main`
+    ```
 
 ## Contributing
 
 ### Lint
 
-Install using pipx:
+Install using [pipx](https://pipx.pypa.io/stable/installation/):
 
 ```sh
 pipx install pre-commit
