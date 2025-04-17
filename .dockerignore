@@ -1,3 +1,9 @@
+__pycache__/
 .git
 .env**
 **/.venv
+*.pyc
+*.pyo
+*.pyd
+*.db
+.DS_Store

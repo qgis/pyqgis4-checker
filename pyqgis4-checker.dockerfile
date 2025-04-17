@@ -1,12 +1,11 @@
-# syntax=docker/dockerfile:1.7-labs
-# Required syntax parser to handle --exclude option for COPY instructions
-
 # Arguments to customize build
 
-# STAGE: BUILD from QGIS Qt6 image
 FROM ghcr.io/qgis/qgis-qt6-unstable:main
 
-LABEL org.opencontainers.image.authors="qgis@oslandia.com"
+LABEL org.opencontainers.image.title="PyQGIS 4 Checker image" \
+    org.opencontainers.image.description="QGIS based on Qt6 with the PyQGIS migration script" \
+    org.opencontainers.image.source="https://github.com/qgis/pyqgis4-checker" \
+    org.opencontainers.image.licenses="GPL-2.0-or-later"
 
 # TEMPORARY: GET THE LATEST SCRIPT VERSION WAITING FOR SOURCE IMAGE TO BE UPDATED
 # COPY --from=build /root/QGIS/scripts/pyqt5_to_pyqt6/* /usr/local/bin/
