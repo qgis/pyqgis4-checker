@@ -135,8 +135,10 @@ jobs:
       - name: Test image
         id: qgis_test
         run: |
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test whoami
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test qgis --version
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
 
       - name: Push Docker image
         id: main_push
@@ -146,6 +148,7 @@ jobs:
           annotations: ${{ steps.main_meta.outputs.annotations }}
           cache-from: |
             type=gha
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
@@ -229,6 +232,7 @@ jobs:
 
       - name: Test image
         run: |
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test whoami
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test pyqt5_to_pyqt6.py --help
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
