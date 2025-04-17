@@ -19,6 +19,8 @@ Test QGIS Desktop with Qt6 running within a Docker container.
 
 ### Tagging Strategy
 
+Images are available on the [GitHub registry](https://github.com/orgs/qgis/packages?repo_name=pyqgis4-checker)
+
 | Event                   | Docker tag applied              | Description                                                      |
 | :---------------------- | :-----------------------------: | :--------------------------------------------------------------- |
 | Commit on `main` branch | `main`                          | Development image, always up to date with QGIS main branch.      |
@@ -138,9 +140,9 @@ Using the published image:
 
 ```sh
 # print the help
-docker run docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --help
+docker run --pull always ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" docker pull ghcr.io/qgis/pyqgis4-checker:main:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 Locally, after build:
@@ -172,7 +174,7 @@ It's also possible to push the image directly from the local build:
 1. Then build the image tagging with the registry URI:
 
     ```sh
-    docker build --pull --rm -f 'Dockerfile' -t docker pull ghcr.io/qgis/pyqgis4-checker:main:main .
+    docker build --pull --rm -f 'Dockerfile' -t docker pull ghcr.io/qgis/pyqgis4-checker:main .
     ```
 
 1. Push it:
