@@ -130,7 +130,7 @@ Get your QGIS plugin ready for QGIS 4 using the migration script to check your c
 # print the help
 docker run --rm --pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" docker pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Build locally
@@ -148,12 +148,16 @@ docker buildx build --pull --rm --file pyqgis4-checker.dockerfile \
 ### Run local image
 
 ```sh
+# print the username
+docker run pyqgis4-checker:local whoami
 # print the QGIS version
 docker run pyqgis4-checker:local qgis --version
-# print the help
+# print the Qt version shipped from PyQGIS
+docker run pyqgis4-checker:local python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
+# print migration script the help
 docker run pyqgis4-checker:local pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Publish
