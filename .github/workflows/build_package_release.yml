@@ -110,7 +110,6 @@ jobs:
         id: main_build
         uses: docker/build-push-action@v6.15.0
         with:
-          annotations: ${{ steps.main_meta.outputs.annotations }}
           build-args: |
             QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
@@ -122,7 +121,6 @@ jobs:
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           load: true
-          push: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
 
       - name: Test image
@@ -137,15 +135,22 @@ jobs:
         uses: docker/build-push-action@v6.15.0
         with:
           annotations: ${{ steps.main_meta.outputs.annotations }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
-          load: false
           push: true
           tags: ${{ steps.main_meta.outputs.tags }}
           labels: ${{ steps.main_meta.outputs.labels }}
 
       # Generates an artifact attestation for the image which is an unforgeable statement about where and how it was built. It increases supply chain security for people who consume the image. For more information, see [Using artifact attestations to establish provenance for builds](/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
       - name: Generate artifact attestation
+        id: main_attestation
+        if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
