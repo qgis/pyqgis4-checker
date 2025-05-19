@@ -130,7 +130,7 @@ Get your QGIS plugin ready for QGIS 4 using the migration script to check your c
 # print the help
 docker run --rm --pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm --platform linux/amd64 -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Build locally
