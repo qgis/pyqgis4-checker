@@ -116,7 +116,7 @@ docker run -it --rm \
   -e LC_ALL=C.utf8 \
   -e LANG=C.utf8 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
-  qgis-qt6-unstable:main \
+  qgis-qt6-unstable:local \
   qgis
 ```
 
