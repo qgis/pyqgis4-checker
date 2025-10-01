@@ -116,7 +116,7 @@ jobs:
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
       - name: Build Docker image
         id: main_build
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.18.0
         with:
           build-args: |
             QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
@@ -143,7 +143,7 @@ jobs:
       - name: Push Docker image
         id: main_push
         if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.18.0
         with:
           annotations: ${{ steps.main_meta.outputs.annotations }}
           cache-from: |
@@ -214,7 +214,7 @@ jobs:
 
       - name: Build Docker image
         id: checker_build
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.18.0
         with:
           annotations: ${{ steps.checker_meta.outputs.annotations }}
           cache-from: |
@@ -240,7 +240,7 @@ jobs:
       - name: Push Docker image
         id: checker_push
         if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.18.0
         with:
           annotations: ${{ steps.checker_meta.outputs.annotations }}
           cache-from: |
