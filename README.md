@@ -54,7 +54,7 @@ docker run -it --rm \
 Classic:
 
 ```sh
-docker build --pull --rm -f qgis-qt6-unstable.dockerfile \
+docker build --pull missing --rm -f qgis-qt6-unstable.dockerfile \
     --progress=plain \
     --build-arg QGIS_GIT_VERSION=master \
     -t qgis-qt6-unstable:local .
@@ -128,9 +128,9 @@ Get your QGIS plugin ready for QGIS 4 using the migration script to check your c
 
 ```sh
 # print the help
-docker run --rm --pull ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
+docker run --rm --pull missing ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run --rm --platform linux/amd64 -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run --rm --pull missing --platform linux/amd64 -v "$(pwd):/home/pyqgisdev/" ghcr.io/qgis/pyqgis4-checker:main pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Build locally
