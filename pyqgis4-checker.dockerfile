@@ -1,6 +1,7 @@
 # Arguments to customize build
+ARG BASE_IMAGE=ghcr.io/qgis/qgis-qt6-unstable:main
 
-FROM ghcr.io/qgis/qgis-qt6-unstable:main
+FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.title="PyQGIS 4 Checker image" \
     org.opencontainers.image.description="QGIS based on Qt6 with the PyQGIS migration script" \
