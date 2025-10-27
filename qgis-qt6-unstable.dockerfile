@@ -95,6 +95,7 @@ RUN dnf install --nodocs --refresh -y \
     qt6-qtwebengine \
     qtkeychain-qt6 \
     qwt-qt6 \
+    SFCGAL \
     spatialindex \
     util-linux \
     # locale generation
