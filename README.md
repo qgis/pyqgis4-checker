@@ -135,6 +135,19 @@ docker run --rm --pull missing --platform linux/amd64 -v "$(pwd):/home/pyqgisdev
 
 ### Build locally
 
+#### Using published `qgis-qt6-unstable:main` image
+
+Classic:
+
+```sh
+docker build --pull missing --rm --file pyqgis4-checker.dockerfile \
+  --build-arg BASE_IMAGE=ghcr.io/qgis/qgis-qt6-unstable:main \
+  --progress=plain \
+  --tag pyqgis4-checker:local .
+```
+
+With BuildKit and advanced cache:
+
 ```sh
 docker buildx build --pull --rm --file pyqgis4-checker.dockerfile \
   --cache-from type=local,src=.cache/docker/qgis/ \
@@ -142,6 +155,28 @@ docker buildx build --pull --rm --file pyqgis4-checker.dockerfile \
   --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
   --load \
   --progress plain \
+  --tag pyqgis4-checker:local .
+```
+
+#### Using locally built `qgis-qt6-unstable:local` image
+
+Classic:
+
+```sh
+docker build --file pyqgis4-checker.dockerfile \
+  --build-arg BASE_IMAGE=qgis-qt6-unstable:local \
+  --tag pyqgis4-checker:local .
+```
+
+With BuildKit and advanced cache:
+
+```sh
+docker buildx build --rm --file pyqgis4-checker.dockerfile \
+  --build-context base-image=docker-image://qgis-qt6-unstable:local \
+  --cache-from type=local,src=.cache/docker/qgis/ \
+  --cache-from type=registry,ref=ghcr.io/qgis/pyqgis4-checker:cache \
+  --load \
+  --progress=plain \
   --tag pyqgis4-checker:local .
 ```
 
