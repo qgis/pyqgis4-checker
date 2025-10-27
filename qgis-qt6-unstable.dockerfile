@@ -66,6 +66,7 @@ COPY --from=stage-build /root/QGIS/build/usr/lib/ /usr/lib/
 
 # Install required dependencies
 RUN dnf install --nodocs --refresh -y \
+    blend2d \
     draco \
     gdal \
     gdal-python-tools \
