@@ -35,6 +35,7 @@ ENV BUILD_WITH_QT6=ON \
     WITH_QT5=OFF \
     WITH_QTWEBENGINE=ON \
     WITH_QUICK=ON \
+    WITH_SFCGAL=OFF \
     XDG_RUNTIME_DIR=/tmp
 
 # clone QGIS source code and launch QGIS build
