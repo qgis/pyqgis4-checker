@@ -10,7 +10,7 @@ ARG QGIS_GIT_VERSION=master
 ARG BASE_RUN_IMAGE=stage-build
 
 # -- STAGE: BUILD from QGIS Qt6 image
-FROM qgis/qgis3-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as stage-build
+FROM qgis/qgis3-fedora-qt6-build-deps-bin-only:${QGIS_GIT_VERSION} as stage-build
 
 ARG QGIS_GIT_VERSION
 

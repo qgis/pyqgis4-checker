@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
     inputs:
       qgis_version:
-        description: "Tag for qgis/qgis3-qt6-build-deps-bin-only base image"
+        description: "Tag for qgis/qgis3-fedora-qt6-build-deps-bin-only base image"
         required: true
         default: master
 
