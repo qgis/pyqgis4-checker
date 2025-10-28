@@ -111,7 +111,7 @@ docker run -it --rm \
 Classic:
 
 ```sh
-docker build --pull missing --rm -f qgis-qt6-unstable.dockerfile \
+docker build --pull missing --rm -f qgis-qt6-fedora-unstable.dockerfile \
     --progress=plain \
     --build-arg QGIS_GIT_VERSION=master \
     -t qgis-qt6-unstable:local .
@@ -124,7 +124,7 @@ docker buildx create --name qgisbuilder --driver docker-container --use
 ```
 
 ```sh
-docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
+docker buildx build --pull --rm --file qgis-qt6-fedora-unstable.dockerfile \
     --build-arg CCACHE_DIR=/root/.ccache \
     --build-arg QGIS_GIT_VERSION=master \
     --cache-from type=local,src=.cache/docker/qgis/ \
@@ -143,7 +143,7 @@ docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
 It's also possible to reuse the build cache directly local and remote, saving a lot of time:
 
 ```sh
-docker buildx build --pull --rm --file qgis-qt6-unstable.dockerfile \
+docker buildx build --pull --rm --file qgis-qt6-fedora-unstable.dockerfile \
   --target stage-run \
   --build-arg BASE_RUN_IMAGE=ghcr.io/qgis/qgis-qt6-unstable:main \
   --cache-from type=local,src=.cache/docker/qgis/ \
