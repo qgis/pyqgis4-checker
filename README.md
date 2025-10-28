@@ -13,6 +13,63 @@ This repository aims to provide developers with tools for the migration of QGIS 
 - network access to: docker.com, github.com, gitlab.com
 - available disk space: ~10 Go
 
+## QGIS with Qt6 (Ubuntu based)
+
+### Build locally
+
+Classic:
+
+```sh
+docker build --pull missing --rm -f qgis4-qt6-ubuntu-unstable.dockerfile \
+    --progress=plain \
+    --build-arg QGIS_GIT_VERSION=master \
+    --tag qgis-qt6-ubuntu-unstable:local .
+```
+
+With BuildKit and advanced cache:
+
+```sh
+docker buildx create --name qgisbuilder --driver docker-container --use
+```
+
+```sh
+docker buildx build --pull --rm --file qgis4-qt6-ubuntu-unstable.dockerfile \
+    --build-arg CCACHE_DIR=/root/.ccache \
+    --build-arg QGIS_GIT_VERSION=master \
+    --cache-from type=local,src=.cache/docker/qgis/ \
+    --cache-from type=registry,ref=ghcr.io/qgis/qgis-qt6-unstable:cache \
+    --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
+    --load \
+    --platform linux/amd64 \
+    --tag qgis-qt6-ubuntu-unstable:local .
+```
+
+> [!NOTE]
+> This command store a local cache under .cache/docker/qgis/. If you need to save disk space, clen up this folder. Alternatively, you can set it to a temporary folder i.e. `/tmp/docker/cache`.
+
+### Run local image
+
+Get into the container:
+
+```sh
+docker run -it --rm --name qgis-qt6 qgis-qt6-ubuntu-unstable:local /bin/bash
+```
+
+To launch QGIS from the host, use the following command (requires a x11 server):
+
+```sh
+# authorize the docker user to x11
+xhost +local:docker
+# launch QGIS from inside the Docker and stream the display with x11 to your host
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -e LC_ALL=C.utf8 \
+  -e LANG=C.utf8 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  qgis-qt6-ubuntu-unstable:local \
+  qgis
+```
+
 ## QGIS with Qt6 (Fedora based)
 
 Test QGIS Desktop with Qt6 running within a Docker container.
