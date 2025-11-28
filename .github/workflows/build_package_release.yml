@@ -8,7 +8,7 @@ on:
     paths:
       - .github/workflows/build_package_release.yml
       - .dockerignore
-      - "*.dockerfile"
+      - "pyqgis4-checker-*.dockerfile"
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
 
@@ -29,12 +29,15 @@ on:
       linux_distro:
         description: "Linux distribution to build (fedora or ubuntu)"
         required: true
-        default: fedora
+        default: ubuntu
         type: choice
         options:
           - fedora
           - ubuntu
-
+      distro_version:
+        description: "Version of the Linux Distro (e.g., 24.04)"
+        required: true
+        default: "25.10"
 
 # Allow one concurrent deployment
 concurrency:
@@ -45,22 +48,19 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   # Dynamic distribution selection
-  LINUX_DISTRO: ${{ github.event.inputs.linux_distro || 'fedora' }}
+  LINUX_DISTRO: ${{ github.event.inputs.linux_distro || 'ubuntu' }}
+  LINUX_DISTRO_VERSION: ${{ github.event.inputs.distro_version || '25.10' }}
   QGIS_GIT_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version || 'master' }}
 
 
 jobs:
   docker-qgis-qt6:
-    name: "🐳 Build QGIS with Qt6 (${{ matrix.distro }})"
+    name: "🐳 Build QGIS-Qt6 (${{ github.event.inputs.linux_distro || 'ubuntu' }})"
     runs-on: ubuntu-latest
 
     env:
-      DOCKERFILE_PATH: pyqgis4-checker-ubuntu.dockerfile
-      IMAGE_NAME: ${{ github.repository_owner }}/qgis-qt6-unstable
-      REGISTRY: ghcr.io
-      QGIS_GIT_VERSION: >
-        ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version ||
-            'master' }}
+      DOCKERFILE_PATH: pyqgis4-checker-${{ github.event.inputs.linux_distro || 'ubuntu' }}.dockerfile
+      IMAGE_NAME: ${{ github.repository_owner }}/pyqgis4-checker
 
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
@@ -87,6 +87,7 @@ jobs:
 
       - name: Cache ccache (QGIS compilation)
         uses: actions/cache@v4
+        if: env.LINUX_DISTRO == 'fedora'
         env:
           DOCKERFILE_PATH: ${{ env.DOCKERFILE_PATH }}
         with:
@@ -118,11 +119,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ env.QGIS_GIT_VERSION }},enable=${{ env.QGIS_GIT_VERSION != 'master' }}
+            type=ref,event=branch,suffix=-${{ env.LINUX_DISTRO }}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }},suffix=-${{ env.LINUX_DISTRO }}            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ env.LINUX_DISTRO }}
+            type=raw,value=${{ env.QGIS_GIT_VERSION }},enable=${{ env.QGIS_GIT_VERSION != 'master' }},suffix=-${{ env.LINUX_DISTRO }}
 
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see [Usage](https://github.com/docker/build-push-action#usage) in the README of the `docker/build-push-action` repository.
@@ -132,14 +132,15 @@ jobs:
         uses: docker/build-push-action@v6.18.0
         with:
           build-args: |
+            LINUX_DISTRO_NAME=${{ env.LINUX_DISTRO }}
+            LINUX_DISTRO_VERSION=${{ env.LINUX_DISTRO_VERSION }}
             QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
             type=gha
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-${{ env.LINUX_DISTRO }}
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache-${{ env.LINUX_DISTRO }},mode=max
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           load: true
@@ -162,9 +163,12 @@ jobs:
         uses: docker/build-push-action@v6.18.0
         with:
           annotations: ${{ steps.main_meta.outputs.annotations }}
+          build-args: |
+            LINUX_DISTRO_NAME=${{ env.LINUX_DISTRO }}
+            LINUX_DISTRO_VERSION=${{ env.LINUX_DISTRO_VERSION }}
+            QGIS_GIT_VERSION=${{ env.QGIS_GIT_VERSION }}
           cache-from: |
             type=gha
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
             type=gha,mode=max
