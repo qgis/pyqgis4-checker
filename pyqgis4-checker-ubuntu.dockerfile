@@ -45,6 +45,7 @@ ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5
 # INSTALL QGIS QT6 PACKAGE AND DEPENDENCIES
 RUN apt-get install --no-install-recommends -y \
     python3-qgis \
+    python3-pyqt6.qtquick \
     qgis-qt6 \
     qgis-plugin-grass \
     # python tooling
