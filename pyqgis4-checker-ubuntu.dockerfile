@@ -59,7 +59,7 @@ RUN apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Reference QGIS Python packages into the Python environment
-ENV PYTHONPATH=/usr/lib/python3/dist-packages:$PYTHONPATH
+ENV PYTHONPATH=/usr/lib/python3/dist-packages
 
 # Create non-root user
 RUN useradd -ms /bin/bash quser \
