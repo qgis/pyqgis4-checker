@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKERFILE_PATH: qgis-qt6-fedora-unstable.dockerfile
+      DOCKERFILE_PATH: pyqgis4-checker-ubuntu.dockerfile
       IMAGE_NAME: ${{ github.repository_owner }}/qgis-qt6-unstable
       REGISTRY: ghcr.io
       QGIS_GIT_VERSION: >
