@@ -26,20 +26,32 @@ on:
         description: "Tag for qgis/qgis3-fedora-qt6-build-deps-bin-only base image"
         required: true
         default: master
+      linux_distro:
+        description: "Linux distribution to build (fedora or ubuntu)"
+        required: true
+        default: fedora
+        type: choice
+        options:
+          - fedora
+          - ubuntu
+
 
 # Allow one concurrent deployment
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.inputs.linux_distro || 'fedora' }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 # Globals
 env:
-  LINUX_DISTRIBUTION_NAME: fedora
-  LINUX_DISTRIBUTION_VERSION: "39"
+  REGISTRY: ghcr.io
+  # Dynamic distribution selection
+  LINUX_DISTRO: ${{ github.event.inputs.linux_distro || 'fedora' }}
+  QGIS_GIT_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version || 'master' }}
+
 
 jobs:
   docker-qgis-qt6:
-    name: "🐳 Build QGIS with Qt6 Docker image"
+    name: "🐳 Build QGIS with Qt6 (${{ matrix.distro }})"
     runs-on: ubuntu-latest
 
     env:
@@ -110,6 +122,7 @@ jobs:
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ env.QGIS_GIT_VERSION }},enable=${{ env.QGIS_GIT_VERSION != 'master' }}
 
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see [Usage](https://github.com/docker/build-push-action#usage) in the README of the `docker/build-push-action` repository.
@@ -139,6 +152,9 @@ jobs:
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test qgis --version
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test pyqt5_to_pyqt6.py --help
 
       - name: Push Docker image
         id: main_push
@@ -167,98 +183,4 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.main_push.outputs.digest }}
-          push-to-registry: true
-
-  docker-pyqgis4-checker:
-    name: "🐳 Build PyQGIS4 Checker image"
-    runs-on: ubuntu-latest
-    needs: docker-qgis-qt6
-
-    env:
-      DOCKERFILE_PATH: pyqgis4-checker.dockerfile
-      IMAGE_NAME: ${{ github.repository_owner }}/pyqgis4-checker
-      REGISTRY: ghcr.io
-
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      attestations: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3.6.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: checker_meta
-        uses: docker/metadata-action@v5.8.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Build Docker image
-        id: checker_build
-        uses: docker/build-push-action@v6.18.0
-        with:
-          annotations: ${{ steps.checker_meta.outputs.annotations }}
-          cache-from: |
-            type=gha
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-          cache-to: |
-            type=gha,mode=max
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
-          context: .
-          file: ${{ env.DOCKERFILE_PATH }}
-          load: true
-          push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
-
-      - name: Test image
-        run: |
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test whoami
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test pyqt5_to_pyqt6.py --help
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
-
-      - name: Push Docker image
-        id: checker_push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6.18.0
-        with:
-          annotations: ${{ steps.checker_meta.outputs.annotations }}
-          cache-from: |
-            type=gha
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
-          cache-to: |
-            type=gha,mode=max
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
-          context: .
-          file: ${{ env.DOCKERFILE_PATH }}
-          load: false
-          push: true
-          tags: ${{ steps.checker_meta.outputs.tags }}
-          labels: ${{ steps.checker_meta.outputs.labels }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.checker_push.outputs.digest }}
           push-to-registry: true
