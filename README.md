@@ -28,7 +28,7 @@ Requirements:
 Get into the container:
 
 ```sh
-docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
+docker run -it --pull missing ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
 ```
 
 #### Fedora based
@@ -36,7 +36,7 @@ docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
 Get into the container:
 
 ```sh
-docker run -it --pull --rm ghcr.io/qgis/pyqgis4-checker:main-ubuntu /usr/bin/bash
+docker run -it --pull missing ghcr.io/qgis/pyqgis4-checker:main-ubuntu /usr/bin/bash
 ```
 
 To launch QGIS from the host, use the following command (requires a x11 server):
@@ -129,15 +129,6 @@ docker run -it --rm \
 ## QGIS with Qt6 (Fedora based)
 
 Test QGIS Desktop with Qt6 running within a Docker container.
-
-### Tagging Strategy
-
-| Event                   | Docker tag applied              | Description                                                      |
-| :---------------------- | :-----------------------------: | :--------------------------------------------------------------- |
-| Commit on `main` branch | `main`                          | Development image, always up to date with QGIS main branch.      |
-| Git tag (e.g. `3.40.5`) | `3.40.5`                        | Image matching an official QGIS release.                         |
-| Latest published tag    | `latest`                        | Always synchronized with the most recently published tagged version.     |
-| Build cache export      | `cache`                         | Special tag used to store Docker build cache layers. Not for direct use. |
 
 ### Run published image
 
