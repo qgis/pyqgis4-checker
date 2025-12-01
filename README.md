@@ -36,7 +36,7 @@ docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
 Get into the container:
 
 ```sh
-docker run -it --pull --rm ghcr.io/qgis/qgis-qt6-unstable:main /usr/bin/bash
+docker run -it --pull --rm ghcr.io/qgis/pyqgis4-checker:main-ubuntu /usr/bin/bash
 ```
 
 To launch QGIS from the host, use the following command (requires a x11 server):
