@@ -44,10 +44,12 @@ ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5
 
 # INSTALL QGIS QT6 PACKAGE AND DEPENDENCIES
 RUN apt-get install --no-install-recommends -y \
-    python3-qgis \
-    python3-pyqt6.qtquick \
     qgis-qt6 \
     qgis-plugin-grass \
+    # for Python code editor and console in QGIS
+    python3-pyqt6.qsci \
+    python3-pyqt6.qtquick \
+    python3-qgis-qt6 \
     # python tooling
     python3-pip \
     python3-wheel \
