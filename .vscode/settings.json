@@ -1,6 +1,6 @@
 {
     "[dockerfile]": {
-        "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+        "editor.defaultFormatter": "ms-azuretools.vscode-containers",
         "editor.formatOnSave": true,
         "editor.quickSuggestions": {
             "strings": true
