@@ -97,7 +97,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache ccache (QGIS compilation)
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         if: env.LINUX_DISTRO == 'fedora'
         env:
           DOCKERFILE_PATH: ${{ env.DOCKERFILE_PATH }}
