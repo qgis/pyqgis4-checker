@@ -288,15 +288,15 @@ docker buildx build --rm --file pyqgis4-checker.dockerfile \
 
 ```sh
 # print the username
-docker run pyqgis4-checker:local whoami
+docker run pyqgis4-checker-ubuntu:local whoami
 # print the QGIS version
-docker run pyqgis4-checker:local qgis --version
+docker run pyqgis4-checker-ubuntu:local qgis --version
 # print the Qt version shipped from PyQGIS
-docker run pyqgis4-checker:local python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
+docker run pyqgis4-checker-ubuntu:local python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
 # print migration script the help
-docker run pyqgis4-checker:local pyqt5_to_pyqt6.py --help
+docker run pyqgis4-checker-ubuntu:local pyqt5_to_pyqt6.py --help
 # on a folder on the host
-docker run -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+docker run -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker-ubuntu:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
 ```
 
 ### Publish

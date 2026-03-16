@@ -3,10 +3,8 @@
 # Arguments to customize build
 ARG LINUX_DISTRO_NAME=ubuntu
 ARG LINUX_DISTRO_VERSION=25.10
-ARG QGIS_GIT_VERSION=master
-ARG BASE_RUN_IMAGE=stage-build
 
-FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION} AS stage-build
+FROM ${LINUX_DISTRO_NAME}:${LINUX_DISTRO_VERSION}
 
 LABEL org.opencontainers.image.title="QGIS with Qt6 (Ubuntu)" \
     org.opencontainers.image.description="QGIS built with Qt6 from source code on Ubuntu base image." \
@@ -35,7 +33,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     # add QGIS key and repository
     && mkdir -p /etc/apt/keyrings \
     && wget -qO /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/qgis-archive-keyring.gpg] https://ubuntu.qgis.org/ubuntu-nightly $(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/qgis.list \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/qgis-archive-keyring.gpg] https://ubuntu.qgis.org/ubuntu $(lsb_release -c -s) main" | tee /etc/apt/sources.list.d/qgis.list \
     && apt-get update
 
 # Add PyQGIS migration script
@@ -44,12 +42,11 @@ ADD --chmod=755 https://github.com/qgis/QGIS/raw/refs/heads/master/scripts/pyqt5
 
 # INSTALL QGIS QT6 PACKAGE AND DEPENDENCIES
 RUN apt-get install -y \
-    qgis-qt6 \
-    qgis-plugin-grass-qt6 \
+    qgis \
+    qgis-plugin-grass \
     # for Python code editor and console in QGIS
     python3-pyqt6.qsci \
     python3-pyqt6.qtquick \
-    python3-qgis-qt6 \
     # python tooling
     python3-pip \
     python3-wheel \
