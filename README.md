@@ -295,8 +295,8 @@ docker run pyqgis4-checker-ubuntu:local qgis --version
 docker run pyqgis4-checker-ubuntu:local python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
 # print migration script the help
 docker run pyqgis4-checker-ubuntu:local pyqt5_to_pyqt6.py --help
-# on a folder on the host
-docker run -v "$(pwd):/home/pyqgisdev/" pyqgis4-checker-ubuntu:local pyqt5_to_pyqt6.py --logfile /home/pyqgisdev/pyqt6_checker.log .
+# on a folder on the host where a plugin is located, with the log file generated on the host as well
+docker run --rm --user $(id -u):$(id -g) --workdir /workspace/ -v "$(pwd):/workspace/" pyqgis4-checker-ubuntu:local pyqt5_to_pyqt6.py --logfile /workspace/pyqt6_checker.log .
 ```
 
 ### Publish
