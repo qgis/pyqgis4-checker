@@ -166,7 +166,6 @@ jobs:
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test qgis --version
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.PyQt.QtCore import QT_VERSION_STR;print(f'Qt {QT_VERSION_STR}')"
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION)"
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test python3 -c "from tokenize_rt import Offset, Token, reversed_enumerate, src_to_tokens, tokens_to_src"
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test pyqt5_to_pyqt6.py --help
 
