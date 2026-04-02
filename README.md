@@ -23,8 +23,25 @@ Based on Ubuntu 25.10 with QGIS installed from the [official QGIS repository](ht
 
 ### Use it locally to check a plugin
 
+#### Dry run (check only, no modification)
+
+> List all the detected incompatibilities in a log file without modifying the code. The script will exit with code 0 even if some incompatibilities are spotted.
+
 ```sh
-docker run --rm --pull missing \
+docker run --rm --pull always \
+  --user $(id -u):$(id -g) \
+  --workdir /workspace/ \
+  -v "$(pwd):/workspace/" \
+  ghcr.io/qgis/pyqgis4-checker:main-ubuntu \
+  pyqt5_to_pyqt6.py --dry_run --logfile /workspace/pyqt6_checker.log .
+```
+
+#### With automatic edit
+
+> Use it carefully, as it will edit your files in place. Make sure to commit your changes before to be able to revert if needed.
+
+```sh
+docker run --rm --pull always \
   --user $(id -u):$(id -g) \
   --workdir /workspace/ \
   -v "$(pwd):/workspace/" \
