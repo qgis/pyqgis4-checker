@@ -2,15 +2,10 @@
 
 [![📦 Build & 🚀 Release](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml/badge.svg)](https://github.com/qgis/pyqgis4-checker/actions/workflows/build_package_release.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/qgis/pyqgis4-checker/main.svg)](https://results.pre-commit.ci/latest/github/qgis/pyqgis4-checker/main)
 
-Tools to check and migrate QGIS plugins from PyQt5 to PyQt6 / QGIS 4.
+Tools to check and migrate QGIS plugins from PyQt5 to PyQt6 for QGIS 4.
 
 > [!NOTE]
-> Now that QGIS 4 is officially released, the project has moved on.
-
-To run the checker, choose the way that fits your setup:
-
-- [Docker Ubuntu](#docker---ubuntu): CI/CD, or no local QGIS install
-- [Docker Fedora](#docker---fedora-advanced): you need recent deps (Qt, GDAL) or specific build options (Oracle, SFCGAL...)
+> Now that QGIS 4 is officially released, the project has moved on and the Fedora based image is no longer maintained.
 
 ## Docker - Ubuntu
 
@@ -181,77 +176,15 @@ docker buildx build --pull --rm \
 
 ---
 
-## Docker - Fedora (advanced)
-
-Based on Fedora 42 with **QGIS compiled from source**. Use this image when you need:
-
-- more recent versions of Qt or GDAL than Ubuntu ships
-- specific build options: Oracle support, SFCGAL, PDF4Qt...
-
-> [!WARNING]
-> This image is significantly larger (~10 GB) and takes much longer to build than the Ubuntu image. For most plugin developers, the Ubuntu image is sufficient.
-
-### Requirements
-
-- Docker >= 28
-- Available disk space: ~10 GB
-
-### Run the published image
-
-```sh
-docker run -it --rm --pull missing \
-  ghcr.io/qgis/pyqgis4-checker:main-fedora /bin/bash
-```
-
-### Build locally
-
-```sh
-docker buildx create --name qgisbuilder --driver docker-container --use
-
-docker buildx build --pull --rm \
-  --file pyqgis4-checker-fedora.dockerfile \
-  --build-arg QGIS_GIT_VERSION=master \
-  --cache-from type=local,src=.cache/docker/qgis/ \
-  --cache-from type=registry,ref=ghcr.io/qgis/pyqgis4-checker:cache-fedora \
-  --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
-  --load \
-  --platform linux/amd64 \
-  --tag pyqgis4-checker-fedora:local \
-  .
-```
-
-> [!NOTE]
-> The local cache is stored under `.cache/docker/qgis/`. Clean it up to free disk space, or use `/tmp/docker/cache` instead.
-
-#### Skip recompilation (build only the `stage-run` layer)
-
-When iterating on the runtime environment without changing the QGIS build itself, reuse the compiled binaries from the published image:
-
-```sh
-docker buildx build --pull --rm \
-  --file pyqgis4-checker-fedora.dockerfile \
-  --target stage-run \
-  --build-arg BASE_RUN_IMAGE=ghcr.io/qgis/pyqgis4-checker:main-fedora \
-  --cache-from type=local,src=.cache/docker/qgis/ \
-  --cache-from type=registry,ref=ghcr.io/qgis/pyqgis4-checker:cache-fedora \
-  --cache-to type=local,dest=.cache/docker/qgis/,mode=max \
-  --load \
-  --platform linux/amd64 \
-  --tag pyqgis4-checker-fedora:local \
-  .
-```
-
----
-
 ## Publishing strategy
 
 Docker images are built and published automatically via GitHub Actions:
 
 | Event | Tag |
-|---|---|
-| Push to `main` | `main-ubuntu`, `main-fedora` |
+| :---  | :-: |
+| Push to `main` | `main-ubuntu` |
 | Semantic version tag (e.g. `1.2.3`) | `1.2.3-ubuntu`, `1.2-ubuntu`, `latest-ubuntu` |
-| Manual dispatch with a specific QGIS version | `3.40-ubuntu` |
+| Manual dispatch with a specific QGIS version | `main-ubuntu` |
 
 ---
 
