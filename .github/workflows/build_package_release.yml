@@ -37,7 +37,7 @@ on:
       distro_version:
         description: "Version of the Linux Distro (e.g., 24.04)"
         required: true
-        default: "25.10"
+        default: "26.04"
 
 # Allow one concurrent deployment
 concurrency:
