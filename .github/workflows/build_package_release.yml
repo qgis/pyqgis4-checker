@@ -49,7 +49,7 @@ env:
   REGISTRY: ghcr.io
   # Dynamic distribution selection
   LINUX_DISTRO: ${{ github.event.inputs.linux_distro || 'ubuntu' }}
-  LINUX_DISTRO_VERSION: ${{ github.event.inputs.distro_version || '25.10' }}
+  LINUX_DISTRO_VERSION: ${{ github.event.inputs.distro_version || '26.04' }}
   QGIS_GIT_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.qgis_version || 'master' }}
 
 

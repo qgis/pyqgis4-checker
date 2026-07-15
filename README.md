@@ -14,7 +14,7 @@ To run the checker, choose the way that fits your setup:
 
 ## Docker - Ubuntu
 
-Based on Ubuntu 25.10 with QGIS installed from the [official QGIS repository](https://qgis.org/resources/installation-guide/).
+Based on Ubuntu 26.04 with QGIS installed from the [official QGIS repository](https://qgis.org/resources/installation-guide/).
 
 ### Requirements
 
