@@ -196,7 +196,7 @@ jobs:
       - name: Generate artifact attestation
         id: main_attestation
         if: github.event_name != 'pull_request'
-        uses: actions/attest@v4.2.1
+        uses: actions/attest@v4.2.2
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.main_push.outputs.digest }}
